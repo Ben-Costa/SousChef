@@ -2,8 +2,6 @@
 Full Suite Recipe application
 
 # Steps to do
-1. Set up jest -> https://www.valentinog.com/blog/jest/#:~:text=Jest%20is%20a%20JavaScript%20test%20runner%2C%20that%20is%2C,you%20can%20install%20it%20in%20any%20JavaScript%20project.
-
 2. Set up project remainder -> https://www.youtube.com/watch?v=wM3TEvQn2hw&ab_channel=TheCodingTrain
 
 3. set up react https://www.youtube.com/watch?v=5Vxx5UkjV4s&ab_channel=ArpanNeupane
