@@ -12,6 +12,31 @@ Full Suite Recipe application
 
 https://www.youtube.com/watch?v=HBH6qnj0trU&t=224s&pp=ygURYXBpIGJlc3QgcHJhY3RjZXM%3D
 
+# Git Hooks
+Create a Hooks Directory:
+In your Git repository, create a directory to store your hooks. You can name it .githooks or any other suitable name.
+For example, run the following command in your repository:
+mkdir .githooks
+
+Add Your Hooks:
+Inside the .githooks directory, create your hook scripts. These scripts can be shell scripts, Python scripts, or any other executable files.
+Common hooks include pre-commit, post-commit, pre-push, etc.
+For example, create a pre-commit hook script that checks for code style compliance.
+Configure Git to Use the Hooks:
+Git looks for hooks in the .git/hooks directory by default.
+To use the hooks from your repository, configure Git to look in your custom hooks directory:
+git config --local core.hooksPath .githooks/
+
+Commit and Share:
+Commit your hooks directory and scripts to your repository.
+When other developers clone the repository, they’ll automatically use the hooks from the shared directory.
+
+# Git Actions
+1. run jest
+2. run eslint
+3. run code scan
+
+
 # Dev Notes:
 Node.js Best Practices
 Use async/await: Async/await makes your code look synchronous, and it’s easier to understand and read.
