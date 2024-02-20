@@ -1,0 +1,1 @@
+This directory contains the static files served by your React application. The index.html file is the page template; the favicon.ico is the icon you see in the browser tab; and the manifest.json file is for PWA (Progressive Web App) metadata.

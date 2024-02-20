@@ -1,0 +1,23 @@
+{
+  "name": "souschef",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Ben-Costa/SousChef.git",
+  "author": "Ben-PC-2 <bc234cc@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0"
+  },
+  "eslintConfig": {
+    "rules": {
+      "semi": ["error", "always"],
+      "quotes": ["error", "double"]
+    }
+    }
+}
