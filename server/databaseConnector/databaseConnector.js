@@ -1,88 +1,74 @@
 //Export the class from file A, e.g. export class Employee {}.
 //Import the class in file B as import {Employee} from './another-file.js'.
 
-class databaseConnector {
+import { User } from "../dataObjects/user"
+import { Recipe } from "../dataObjects/recipe"
+import { Ingredient } from "../dataObjects/ingredients";
+
+export class databaseConnector {
     /* Parent class that defines the requirements of any database connector.
        Implementation of the DB Connector functions allows for interface with
        server allowing for lift and shift of different databases */
     constructor() {
-      // Initialization code left to the children as setup is different
+      if (new.target === Parent) {
+        throw new Error("Cannot instantiate abstract class");
+      }    
     }
-
-    /**
-     * Creates a new user in the db
-     * @param {Number} a
-     * @param {Number} b
-     * @param {Boolean} retArr If set to true, the function will return an array
-     * @returns {Number|Array} Sum of a and b or an array that contains a, b and the sum of a and b.
-     */    
-    createUser() {
-
+ 
+    createUser(userToAdd) {
+      if (typeof userToAdd !== User) {
+        throw new Error("Subclasses must implement requiredMethod with valid parameters");
+      }
     }
-
-        /**
-     * Creates a new user in the db
-     * @param {Number} a
-     * @param {Number} b
-     * @param {Boolean} retArr If set to true, the function will return an array
-     * @returns {Number|Array} Sum of a and b or an array that contains a, b and the sum of a and b.
-     */    
-    readUser() {
+  
+    readUser(userName) {
         /*allow for search for users by username, name, email using templated query that builds based on additions of optional args */
+        if (typeof userName !== "string") {
+          throw new Error("Subclasses must implement requiredMethod with valid parameters");
+        }
     }
-
-        /**
-     * Creates a new user in the db
-     * @param {Number} a
-     * @param {Number} b
-     * @param {Boolean} retArr If set to true, the function will return an array
-     * @returns {Number|Array} Sum of a and b or an array that contains a, b and the sum of a and b.
-     */    
-    updateUser() {
+  
+    searchUsers(userName, name) {
 
     }
 
-            /**
-     * Creates a new user in the db
-     * @param {Number} a
-     * @param {Number} b
-     * @param {Boolean} retArr If set to true, the function will return an array
-     * @returns {Number|Array} Sum of a and b or an array that contains a, b and the sum of a and b.
-     */    
-    deleteUser() {
+    updateUser(userName, userObject) {
+
+    }
+  
+    deleteUser(userName, name) {
 
     }
 
-    createRecipe() {
+    createRecipe(recipeObject) {
 
     }
 
-    readRecipe() {
+    readRecipe(name, ingredients) {
 
     }
 
-    updateRecipe() {
+    updateRecipe(name, recipeObject) {
 
     }
 
-    deleteRecipe() {
+    deleteRecipe(name) {
 
     }
 
-
-    createIngredient() {
-
-    }
-
-    readIngredient() {
+    createIngredient(ingredientObject) {
 
     }
 
-    updateIngredient() {
+    readIngredient(name, typeInfo) {
 
     }
 
-    deleteIngredient() {
+    updateIngredient(name, ingredientObject) {
+
+    }
+
+    deleteIngredient(name) {
 
     }
 
