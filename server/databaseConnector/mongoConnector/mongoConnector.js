@@ -69,7 +69,6 @@ class mongoDBConnector extends databaseConnector{
   }
 
   async readUser(userNameToFind) {
-      /*allow for search for users by username, name, email using templated query that builds based on additions of optional args */
       try{
         collection = this.dbName.collection(this.collectionMap['Users']) 
         user = await collection.find({userName: userNameToFind})
@@ -94,23 +93,72 @@ class mongoDBConnector extends databaseConnector{
     }catch(err){
       console.error(err);
     }
+    //iterate through cursor and create list of user objects 
+    
     return User(user)
   }
 
-  updateUser(userName, userObject) {
-
+  async updateUser(userObject) {
+    updateDoc = userObject.toJSON()
+    filter = {'userName': userObject.getUserName()};
+    options = { upsert: true };
+    try{
+      collection = this.dbName.collection(this.collectionMap['Users']) 
+      result = await collection.updateOne(filter, updateDoc, options)
+    }catch(err){
+      console.error(err)
+    }
   }
 
-  deleteUser(userName, name) {
-
+  async deleteUser(userName) {
+    query = {'userName': userName};
+    try{
+      collection = this.dbName.collection(this.collectionMap['Users']) 
+      result = await collection.deleteOne(query)
+      if ( result.deletedCount == 1){
+        console.log("Successfully deleted user:" + userName)
+      }
+      else{
+        console.log("No documents matched. 0 users deleted")
+      }
+    }catch(err){
+      console.error(err)
+    }
   }
 
-  createRecipe(recipeObject) {
-
+  async createRecipe(recipeToAdd) {
+    let documentJSON = []
+    
+    for (let index = 0; index < recipeToAdd.length; index++) {
+      documentJSON.append(recipeToAdd[index].toJSON())
+    }
+    
+    try{
+      collection = this.dbName.collection(this.collectionMap['Recipes']) 
+      await collection.insertMany(documentJSON)
+    }catch(err){
+      console.error(err);
+    }
   }
 
-  readRecipe(name, ingredients) {
-
+  //todo
+  async searchRecipes(recipeName, ingredients) {
+    //build search query
+    const query = {
+      $or: [
+        { name: { $regex: query, $options: "i" } }, // Case-insensitive
+        { username: { $regex: query, $options: "i" } },
+      ],
+    };
+    try{
+      collection = this.dbName.collection(this.collectionMap['Users']) 
+      foundUsersCursor = await collection.find({})
+    }catch(err){
+      console.error(err);
+    }
+    //iterate through cursor and create list of user objects 
+    
+    return User(user)
   }
 
   updateRecipe(name, recipeObject) {
@@ -120,7 +168,6 @@ class mongoDBConnector extends databaseConnector{
   deleteRecipe(name) {
 
   }
-
 
   createIngredient(ingredientObject) {
 
