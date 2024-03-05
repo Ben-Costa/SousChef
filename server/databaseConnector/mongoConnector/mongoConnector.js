@@ -1,9 +1,8 @@
-import { User } from '../../dataObjects/user';
-import { databaseConnector } from '../databaseConnector';
+import  User  from '../../dataObjects/user.js';
+import databaseConnector from '../databaseConnector.js';
+import  MongoClient  from 'mongodb';
 
-const { MongoClient } = require("mongodb");
-
-class mongoDBConnector extends databaseConnector{
+export default class mongoDBConnector extends databaseConnector{
   constructor(dbURL, credentials, dbName){
     //Recipe collection map
     this.collectionMap = {
@@ -25,8 +24,11 @@ class mongoDBConnector extends databaseConnector{
     try {
       // Create a new MongoClient instance
       this.client = new MongoClient(this.uri, {
-        tlsCertificateKeyFile: this.credentials,
-        serverApi: ServerApiVersion.v1
+        serverApi: {
+          version: ServerApiVersion.v1,
+          strict: true,
+          deprecationErrors: true,
+        }
       });
       // Connect to the server
       await this.client.connect();
@@ -83,8 +85,8 @@ class mongoDBConnector extends databaseConnector{
     //build search query
     const query = {
       $or: [
-        { name: { $regex: query, $options: "i" } }, // Case-insensitive
-        { username: { $regex: query, $options: "i" } },
+        { name: { $regex: name, $options: "i" } }, // Case-insensitive
+        { username: { $regex: userName, $options: "i" } },
       ],
     };
     try{
@@ -131,8 +133,7 @@ class mongoDBConnector extends databaseConnector{
     
     for (let index = 0; index < recipeToAdd.length; index++) {
       documentJSON.append(recipeToAdd[index].toJSON())
-    }
-    
+    }  
     try{
       collection = this.dbName.collection(this.collectionMap['Recipes']) 
       await collection.insertMany(documentJSON)
@@ -141,48 +142,110 @@ class mongoDBConnector extends databaseConnector{
     }
   }
 
-  //todo
   async searchRecipes(recipeName, ingredients) {
     //build search query
     const query = {
       $or: [
-        { name: { $regex: query, $options: "i" } }, // Case-insensitive
-        { username: { $regex: query, $options: "i" } },
+        { recipeName: { $regex: recipeName, $options: "i" } }, // Case-insensitive
+        { ingredients: { $in: ingredients } },
       ],
     };
     try{
-      collection = this.dbName.collection(this.collectionMap['Users']) 
-      foundUsersCursor = await collection.find({})
+      collection = this.dbName.collection(this.collectionMap['Recipes']) 
+      foundRecipes = await collection.find(query).toArray()
     }catch(err){
       console.error(err);
     }
-    //iterate through cursor and create list of user objects 
+    return foundRecipes
+  }
+
+  async updateRecipe(recipeObject) {
+    updateDoc = recipeObject.toJSON()
+    filter = {'name': recipeObject.getRecipeName()};
+    options = { upsert: true };
+    try{
+      collection = this.dbName.collection(this.collectionMap['Recipes']) 
+      result = await collection.updateOne(filter, updateDoc, options)
+    }catch(err){
+      console.error(err)
+    }
+  }
+
+  async deleteRecipe(recipeName) {
+    query = {'name': recipeName};
+    try{
+      collection = this.dbName.collection(this.collectionMap['Recipes']) 
+      result = await collection.deleteOne(query)
+      if ( result.deletedCount == 1){
+        console.log("Successfully deleted recipe:" + recipeName)
+      }
+      else{
+        console.log("No documents matched. 0 recipes deleted")
+      }
+    }catch(err){
+      console.error(err)
+    }
+  }
+
+  async createIngredient(ingredienToAdd) {
+    let documentJSON = []
     
-    return User(user)
+    for (let index = 0; index < ingredienToAdd.length; index++) {
+      documentJSON.append(ingredienToAdd[index].toJSON())
+    }
+    
+    try{
+      collection = this.dbName.collection(this.collectionMap['Ingredients']) 
+      await collection.insertMany(documentJSON)
+    }catch(err){
+      console.error(err);
+    }
   }
 
-  updateRecipe(name, recipeObject) {
+  async searchIngredients(name) {
+    //build search query
+    const query = {
+      $or: [
+        { name: { $regex: name, $options: "i" } } // Case-insensitive
+      ],
+    };
+    try{
+      collection = this.dbName.collection(this.collectionMap['Ingredients']) 
+      foundRecipes = await collection.find(query).toArray()
+    }catch(err){
+      console.error(err);
+    }
 
+    return foundRecipes
   }
 
-  deleteRecipe(name) {
-
+  async updateIngredient(ingredientObject) {
+    updateDoc = ingredientObject.toJSON()
+    filter = {'name': ingredientObject.getRecipeName()};
+    options = { upsert: true };
+    try{
+      collection = this.dbName.collection(this.collectionMap['Ingredients']) 
+      result = await collection.updateOne(filter, updateDoc, options)
+    }catch(err){
+      console.error(err)
+    }
   }
 
-  createIngredient(ingredientObject) {
-
-  }
-
-  readIngredient(name, typeInfo) {
-
-  }
-
-  updateIngredient(name, ingredientObject) {
-
-  }
-
-  deleteIngredient(name) {
-
+  async deleteIngredient(ingredientName) {
+    query = {'name': ingredientName};
+    try{
+      collection = this.dbName.collection(this.collectionMap['Ingredients']) 
+      result = await collection.deleteOne(query)
+      if ( result.deletedCount == 1){
+        console.log("Successfully deleted recipe:" + ingredientName)
+      }
+      else{
+        console.log("No documents matched. 0 ingredients deleted")
+      }
+    }catch(err){
+      console.error(err)
+    }
   }
 
 }
+

@@ -1,11 +1,11 @@
 //Export the class from file A, e.g. export class Employee {}.
 //Import the class in file B as import {Employee} from './another-file.js'.
 
-import { User } from "../dataObjects/user"
-import { Recipe } from "../dataObjects/recipe"
-import { Ingredient } from "../dataObjects/ingredients";
+import  User  from "../dataObjects/user.js"
+import  Recipe  from "../dataObjects/recipe.js"
+import  Ingredient  from "../dataObjects/ingredients.js";
 
-export class databaseConnector {
+export default class databaseConnector {
     /* Parent class that defines the requirements of any database connector.
        Implementation of the DB Connector functions allows for interface with
        server allowing for lift and shift of different databases */

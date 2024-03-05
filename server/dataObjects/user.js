@@ -1,6 +1,6 @@
-import { Name } from "./name"
+import  Name  from "./name.js"
 
-export class User{
+export default class User{
     constructor(userName, password, email, bDay, name, profilePic){
         this.userName = userName
         this.password = password

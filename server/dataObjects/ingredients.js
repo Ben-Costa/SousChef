@@ -1,6 +1,6 @@
-export class Ingredient {
+export default class Ingredient {
     constructor(ingredientName, integrientTypeInfo, measurementInfo, nutrientsInfo, costInfo){
-        ingredientName = this.ingredientName
+        ingredientName = this.name
         integrientTypeInfo = this.integrientTypeInfo
         measurementInfo = this.measurementInfo
         nutrientsInfo = this.nutrientsInfo

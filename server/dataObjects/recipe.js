@@ -1,6 +1,6 @@
-import { Ingredient } from "./ingredients"
+import Ingredient  from "./ingredients.js"
 
-export class Recipe{
+export default class Recipe{
     constructor(name, ingredientsList, steps, servings, timeInfo){
         name = this.name
         ingredientsList = this.ingredientsList
