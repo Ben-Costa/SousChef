@@ -10,7 +10,7 @@ export default class databaseConnector {
        Implementation of the DB Connector functions allows for interface with
        server allowing for lift and shift of different databases */
     constructor() {
-      if (new.target === Parent) {
+      if (new.target === databaseConnector) {
         throw new Error("Cannot instantiate abstract class");
       }    
     }
