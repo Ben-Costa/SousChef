@@ -6,6 +6,8 @@ export default class mongoDBConnector extends databaseConnector{
   constructor(dbURL, credentials, dbName){
     //Recipe collection map
     super()
+    
+    //TODO: Move to env variables + figure out a way to align with data objects
     this.collectionMap = {
       'Users': 'userCollection',
       'Ingredients': 'Ingredients',
@@ -47,6 +49,7 @@ export default class mongoDBConnector extends databaseConnector{
     try {
       // Close the client connection
       await this.client.close();
+      this.connected = false
       // Log a success message
       console.log("Disconnected from the database");
     } catch (err) {
