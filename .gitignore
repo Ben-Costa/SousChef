@@ -133,4 +133,7 @@ dist
 env-vars
 
 #Avoid posting cert
-x509
+*.pem
+
+secrets
+
