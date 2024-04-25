@@ -41,6 +41,7 @@ export default class mongoDBConnector extends databaseConnector{
     } catch (err) {
       // Log an error message
       console.error(err);
+      throw err
     }
   }
 
@@ -66,6 +67,7 @@ export default class mongoDBConnector extends databaseConnector{
     }
     
     try{
+      //use let for all collection creations
       collection = this.db.collection(this.collectionMap['Users']) 
       await collection.insertMany(documentJSON)
     }catch(err){

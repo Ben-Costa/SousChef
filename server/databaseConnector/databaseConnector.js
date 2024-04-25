@@ -72,5 +72,9 @@ export default class databaseConnector {
 
     }
 
+    override(test){
+      throw new TypeError("Can only add numbers");
+    }
+
   }
   

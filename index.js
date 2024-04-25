@@ -19,7 +19,8 @@ while(!db_connector.connected){
 }
 
 let ingredientName = "b"
-await console.log(db_connector.searchIngredients(ingredientName))
+const foundRecipes = await db_connector.searchIngredients(ingredientName);
+console.log(foundRecipes);
 
 
-//db_connector.disconnect()
+db_connector.disconnect()
