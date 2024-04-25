@@ -18,6 +18,8 @@ while(!db_connector.connected){
     await wait(1000);
 }
 
+//db_connector.override('hi')
+
 let ingredientName = "b"
 const foundRecipes = await db_connector.searchIngredients(ingredientName);
 console.log(foundRecipes);

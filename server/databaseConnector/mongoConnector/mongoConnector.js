@@ -208,6 +208,7 @@ export default class mongoDBConnector extends databaseConnector{
   }
 
   async searchIngredients(name) {
+    super()
     //build search query
     const query = {
       $or: [
@@ -217,7 +218,6 @@ export default class mongoDBConnector extends databaseConnector{
     try{
       let collection = this.db.collection(this.collectionMap['Ingredients']) 
       let foundRecipes = await collection.find(query).toArray()
-      console.log(foundRecipes)
       return foundRecipes
     }catch(err){
       console.error(err);
