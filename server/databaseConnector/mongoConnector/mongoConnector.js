@@ -9,7 +9,7 @@ export default class mongoDBConnector extends databaseConnector{
     
     //TODO: Move to env variables + figure out a way to align with data objects
     this.collectionMap = {
-      'Users': 'userCollection',
+      'Users': 'Users',
       'Ingredients': 'Ingredients',
       'Recipes': 'recipeCollection'
     }
@@ -59,21 +59,24 @@ export default class mongoDBConnector extends databaseConnector{
     }
   }
 
-  async createUser(userToAdd) {
+  async createUser(userToAdds) {
     let documentJSON = []
     
-    for (let index = 0; index < userToAdd.length; index++) {
-      documentJSON.append(userToAdd[index].toJSON())
+    for (let index = 0; index < userToAdds.length; index++) {
+      documentJSON.append(userToAdds[index].toJSON())
     }
+
+    console.log(documentJSON)
     
     try{
       //use let for all collection creations
-      collection = this.db.collection(this.collectionMap['Users']) 
+      let collection = this.db.collection(this.collectionMap['Users']) 
       await collection.insertMany(documentJSON)
     }catch(err){
       console.error(err);
     }
   }
+
 
   async readUser(userNameToFind) {
       try{
@@ -208,7 +211,6 @@ export default class mongoDBConnector extends databaseConnector{
   }
 
   async searchIngredients(name) {
-    super()
     //build search query
     const query = {
       $or: [

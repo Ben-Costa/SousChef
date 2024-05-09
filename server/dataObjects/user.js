@@ -1,7 +1,7 @@
 import  Name  from "./name.js"
 
 export default class User{
-    constructor(userName, password, email, bDay, name, profilePic){
+    constructor(userName, password, email, bDay, nameObj, profilePic){
         this.userName = userName
         this.password = password
         this.email = email
@@ -29,7 +29,19 @@ export default class User{
     getBDay(){
         return this.bDay
     }
+
     getProfilePic(){
         return this.profilePic
+    }
+
+    toJSON(){
+        return {
+            'userName': this.userName,
+            'password': this.password,
+            'email': this.email,
+            'bDay': this.bDay,
+            'nameObj': this.nameObj,
+            'profilePic': this.profilePic
+        }
     }
 }

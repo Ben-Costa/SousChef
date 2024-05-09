@@ -1,5 +1,5 @@
 export default class Name{
-    constructor(firstName, middleName= '', lastName){
+    constructor(firstName, lastName, middleName= ''){
         if (typeof firstName !== "string") {
             throw new Error("Value first name is type: " + typeof(firstName) + ". Expected type string.");
           }
