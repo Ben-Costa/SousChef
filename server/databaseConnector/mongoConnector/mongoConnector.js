@@ -60,52 +60,63 @@ export default class mongoDBConnector extends databaseConnector{
   }
 
   async createUser(userToAdds) {
-    let documentJSON = []
+    let documentJSON = {userList : []}
     
     for (let index = 0; index < userToAdds.length; index++) {
-      documentJSON.append(userToAdds[index].toJSON())
+      documentJSON.userList.push(userToAdds[index].toJSON())
     }
-
-    console.log(documentJSON)
     
     try{
       //use let for all collection creations
       let collection = this.db.collection(this.collectionMap['Users']) 
-      await collection.insertMany(documentJSON)
+      await collection.insertMany(documentJSON.userList)
+      return true
     }catch(err){
-      console.error(err);
+      //todo: make recursive to remove duplicate user and pass in list of remaining users
+      //      will need to search through json list for usernames that match that found in error msg
+      if(err.errmsg.includes('E11000')){
+        console.error(err.errmsg);
+      }
     }
   }
 
 
   async readUser(userNameToFind) {
       try{
-        collection = this.db.collection(this.collectionMap['Users']) 
-        user = await collection.find({userName: userNameToFind})
+        let collection = this.db.collection(this.collectionMap['Users']) 
+        let cursor = await collection.find({userName: userNameToFind})
+        let foundUser = User.fromJSON(await cursor.next())
+        return foundUser
       }catch(err){
         console.error(err);
       }
-      return User(user)
   }
 
   //may need to llook at text search operator
-  async searchUsers(userName, name) {
+  async searchUsers(userName) {
     //build search query
+    //TODO: Add in name search
+    //TODO: make it so search of "" does not add that item to query
+    //TODO: if not items provided, search by username and return to limit
+    //TODO: add limit amount
     const query = {
       $or: [
-        { name: { $regex: name, $options: "i" } }, // Case-insensitive
-        { username: { $regex: userName, $options: "i" } },
+        { userName: { $regex: userName, $options: "i" } }
       ],
     };
     try{
-      collection = this.db.collection(this.collectionMap['Users']) 
-      foundUsersCursor = await collection.find({})
+      let collection = this.db.collection(this.collectionMap['Users']) 
+      let foundUsersCursor = await collection.find(query)
+      let returnUserList = []
+      for await (const returnDoc of foundUsersCursor) {
+        returnUserList.push(User.fromJSON(returnDoc))
+      }
+      return returnUserList
     }catch(err){
       console.error(err);
     }
     //iterate through cursor and create list of user objects 
     
-    return User(user)
   }
 
   async updateUser(userObject) {
@@ -121,10 +132,10 @@ export default class mongoDBConnector extends databaseConnector{
   }
 
   async deleteUser(userName) {
-    query = {'userName': userName};
+    let query = {'userName': userName};
     try{
-      collection = this.db.collection(this.collectionMap['Users']) 
-      result = await collection.deleteOne(query)
+      let collection = this.db.collection(this.collectionMap['Users']) 
+      let result = await collection.deleteOne(query)
       if ( result.deletedCount == 1){
         console.log("Successfully deleted user:" + userName)
       }

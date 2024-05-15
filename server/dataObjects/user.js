@@ -11,7 +11,7 @@ export default class User{
     }
 
     getName(){
-        return nameObj
+        return this.nameObj
     }
 
     getUserName(){
@@ -32,6 +32,10 @@ export default class User{
 
     getProfilePic(){
         return this.profilePic
+    }
+
+    static fromJSON(jsonObj){
+        return new User(jsonObj.userName, jsonObj.password, jsonObj.email, jsonObj.bDay, jsonObj.nameObj, jsonObj.profilePic)
     }
 
     toJSON(){
