@@ -114,18 +114,17 @@ export default class mongoDBConnector extends databaseConnector{
       return returnUserList
     }catch(err){
       console.error(err);
-    }
-    //iterate through cursor and create list of user objects 
-    
+    }    
   }
 
-  async updateUser(userObject) {
-    updateDoc = userObject.toJSON()
-    filter = {'userName': userObject.getUserName()};
-    options = { upsert: true };
+  async updateUser(userName, userObject) {
+    let updateDoc = { $set: userObject.toJSON() }
+    let filter = {'userName': userName};
+    let options = { upsert: true };
     try{
-      collection = this.db.collection(this.collectionMap['Users']) 
-      result = await collection.updateOne(filter, updateDoc, options)
+      let collection = this.db.collection(this.collectionMap['Users']) 
+      let result = await collection.updateOne(filter, updateDoc, options)
+      return result
     }catch(err){
       console.error(err)
     }

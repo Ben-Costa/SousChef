@@ -43,17 +43,31 @@ let readUser = await db_connector.readUser('sillywilly')
 let searchUser = await db_connector.searchUsers("")
 let searchUser1 = await db_connector.searchUsers("BigJMan")
 //updateUser- single
-
+const nameupdate = new Name('Willy', 'Wanga')
+const userupdate = new User('sillybilly', 'xxbigpp', 'xxlittlej@Gman.com', '12/12/12', nameupdate, '')
+let updateUser = await db_connector.updateUser("sillywilly", userupdate)
+console.log(updateUser)
 
 //deleteUser- single, multiple, user not exist
 let delUser = await db_connector.deleteUser("BigJMan")
 let delUserRepeat = await db_connector.deleteUser("BigJMan")
 
+//Ingredients CRUD Integration Tests
+let testIngredients = new Ingredient("test", "testsdf", "sdfsdf", "sdfsd", "sdfsdf")
 
+//Create Ingredients- single and multiple, and duplicate
 
+//Read Ingredients- single
 
+//search Ingredients- try with no name, no user, and both
 let ingredientName = "b"
 const foundRecipes = await db_connector.searchIngredients(ingredientName);
 console.log(foundRecipes);
+
+//update Ingredients- single
+
+//delete Ingredients- single, multiple, user not exist
+
+
 
 db_connector.disconnect()
