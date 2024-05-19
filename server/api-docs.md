@@ -33,34 +33,35 @@ paths:
 Objects:
     - ingredient
         ingredientName (str)
-        integrientTypeInfo (str)
-        measurementInfo (dict)
+        integrientTypeInfo (list: str)
+        measurementInfo (dict: {density_unit: str, amount: dec})
         nutrientsInfo (dict)
-        costInfo (str)
+        costInfo (dict: {monetary_unit: str, amount: dec})
     - user
         userName (str)
         password (str)
         email (str)
         bDay (str)
-        nameObj (dict)
+        nameObj (dict: {firstname: str, lastname: str, middle: str)
         profilePic (str)
+        sessionToken (str)
     - recipe
         name (str)
         ingredientsList (dict) 
         steps (dict) 
         servings (str)
-        timeInfo (dateTime)
+        timeInfo (str)
 
 MongoConnector: 
     - user
         createUser(userToAdds)
-          - will fail currently if one of the users in batch cannot be                added
+          - will fail currently if one of the users in batch cannot be added
         readUser(userNameToFind)
           - requires full username, fill fail if not exists
         searchUsers(userName)
-          - given username substring, will return list of users that                  contain 
+          - given username substring, will return list of users that contain 
         updateUser(userName, userObject)
-          - will attempt to find username and replace entire object with             provided user object
+          - will attempt to find username and replace entire object with provided user object
         deleteUser(userName)
           - will attempt to find username and delete
     - recipe
@@ -86,19 +87,22 @@ MongoConnector:
           - will attempt to find ingredient by name and delete
           - fail if name not exists (exact match)
 paths:
-  /users:
+  /user/{username}:
     get:
-      summary: Returns a user by ID.
+      if username is empty: return current user session user obj
+      summary: Returns a user by exact username
       parameters:
         - 
       responses:
         '200':
     post:
-
     delete:
     
-  /ingredients:
-    get:
+  /users?name=John
+    get 
+    
+  /ingredient/{ingredientname}:
+ get:
       summary: Returns a user by ID.
       parameters:
         - 
@@ -108,13 +112,20 @@ paths:
 
     delete:
 
-  /Recipes:
-    get:
-      summary: Returns a user by ID.
-      parameters:
-        - 
-      responses:
-        '200':
-    post:
+  /ingredients?name=sdfsd&type=integrientTypeInfo:
+   get:
 
-    delete:
+   
+  /recipe/{name}:
+   get:
+        summary: Returns a user by ID.
+        parameters:
+          - 
+        responses:
+          '200':
+      post:
+  
+      delete:
+  
+    /recipes?name&type&ingredients&cost:
+     get:
