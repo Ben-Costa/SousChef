@@ -189,20 +189,35 @@ export default class mongoDBConnector extends databaseConnector{
     }
   }
 
+  /**
+   * Deletes a recipe from the database
+   * 
+   * @param {string} recipeName Name of recipe 
+   * @returns {boolean} true if the recipe succesfully deleted
+   */
   async deleteRecipe(recipeName) {
-    query = {'name': recipeName};
+
+    let deleted = false;
+    let query = {'name': recipeName};
+    
     try{
-      collection = this.db.collection(this.collectionMap['Recipes']) 
-      result = await collection.deleteOne(query)
-      if ( result.deletedCount == 1){
-        console.log("Successfully deleted recipe:" + recipeName)
-      }
-      else{
-        console.log("No documents matched. 0 recipes deleted")
-      }
+
+      let collection = this.db.collection(this.collectionMap.Recipes) 
+      let result = await collection.deleteOne(query)
+      deleted = result.deletedCount == 1;
+
     }catch(err){
       console.error(err)
     }
+
+    if (deleted){
+      console.log("Successfully deleted recipe: " + recipeName)
+    }
+    else{
+      console.log("No documents matched. 0 recipes deleted")
+    }
+
+    return deleted;
   }
 
   async createIngredient(ingredienToAdd) {
