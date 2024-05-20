@@ -38,6 +38,12 @@ let multipleUserCreateDuplicate = await db_connector.createUser([user2, user3]);
 
 //Read User- single
 let readUser = await db_connector.readUser('sillywilly')
+console.log("Read user: ")
+console.log(readUser)
+
+let readUser2 = await db_connector.readUser('s')
+console.log("Read user2: ")
+console.log(readUser2)
 
 //searchUsers- try with no name, no user, and both
 let searchUser = await db_connector.searchUsers("")
@@ -53,21 +59,51 @@ let delUser = await db_connector.deleteUser("BigJMan")
 let delUserRepeat = await db_connector.deleteUser("BigJMan")
 
 //Ingredients CRUD Integration Tests
-let testIngredients = new Ingredient("test", "testsdf", "sdfsdf", "sdfsd", "sdfsdf")
+let testIngredient = new Ingredient("test", "testsdf", "sdfsdf", "sdfsd", "sdfsdf")
+let testIngredient2 = new Ingredient("tomato", "testsdf", "sdfsdf", "sdfsd", "sdfsdf")
+let testIngredient3 = new Ingredient("potato", "testsdf", "sdfsdf", "sdfsd", "sdfsdf")
 
 //Create Ingredients- single and multiple, and duplicate
+console.log("***************Ingredients Tests**********")
+
+let singleIngredient =  await db_connector.createIngredient([testIngredient]);
+let multipleIngredientCreate = await db_connector.createIngredient([testIngredient2, testIngredient3]);
+let multipleIngredientCreateDuplicate = await db_connector.createIngredient([testIngredient2, testIngredient3]);
+
+console.log(singleIngredient)
+console.log(multipleIngredientCreate)
+console.log(multipleIngredientCreateDuplicate)
 
 //Read Ingredients- single
+let readIngredient = await db_connector.readIngredient('tomato')
+console.log("Read ingredient: ")
+console.log(readIngredient)
+
+let readIngredient2 = await db_connector.readIngredient('s')
+console.log("Read ingredient2: ")
+console.log(readIngredient2)
 
 //search Ingredients- try with no name, no user, and both
+console.log("search ingredients")
 let ingredientName = "b"
 const foundRecipes = await db_connector.searchIngredients(ingredientName);
 console.log(foundRecipes);
 
+let ingredientName2 = "ato"
+const foundRecipes2 = await db_connector.searchIngredients(ingredientName2);
+console.log(foundRecipes2);
+
+let ingredientName3 = "tomato"
+const foundRecipes3 = await db_connector.searchIngredients(ingredientName3);
+console.log(foundRecipes3);
+
 //update Ingredients- single
+const ingredientUpdate = new Ingredient('tomatoes', 'xxbigpp', 'there', 'are', 'asdas')
+let updateIngredient = await db_connector.updateUser("tomato", ingredientUpdate)
+console.log(updateIngredient)
 
 //delete Ingredients- single, multiple, user not exist
-
-
+let delIng = await db_connector.deleteUser("tomato")
+let delIngRepeat = await db_connector.deleteUser("tomatoe")
 
 db_connector.disconnect()

@@ -5,6 +5,10 @@ import  User  from "../dataObjects/user.js"
 import  Recipe  from "../dataObjects/recipe.js"
 import  Ingredient  from "../dataObjects/ingredients.js";
 
+
+//TODO: make a init to determine type of connector to return -> this handles determining 
+//      correct connector to make
+
 export default class databaseConnector {
     /* Parent class that defines the requirements of any database connector.
        Implementation of the DB Connector functions allows for interface with

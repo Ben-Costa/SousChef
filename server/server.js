@@ -1,64 +1,70 @@
-const express = require('express')
+import  express from 'express'
+import dotenv from 'dotenv';
+dotenv.config();
+import mongoDBConnector from '../server/databaseConnector/mongoConnector/mongoConnector.js';
+
 const app = express()
-const port = 3000
+const port = process.env.PORT_NUMBER;
+const dbURL = process.env.DATABASE_URL;
+const credentials = process.env.CREDENTIALS_PATH;
+const dbName = process.env.DB_NAME;
+const dbConnectorType = process.env.DB_CONNECTOR_TYPE
+let dbConnector
+console.log(dbConnectorType)
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+//Import in routes
+//User Routes
+import userRoutes from '../server/routes/Users/userRoutes.js'
+app.use('/user', userRoutes);
+import usersRoutes from '../server/routes/Users/usersRoutes.js'
+app.use('/users', usersRoutes);
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+// //Ingredients Routes
+// import ingredientRoutes from '../server/routes/Ingredients/ingredientRoutes.js'
+// app.use('/ingredient', ingredientRoutes);
+// import ingredientsRoutes from '../server/routes/Ingredients/ingredientsRoutes.js'
+// app.use('/ingredients', ingredientsRoutes);
 
+// //Recipes Routes
+// import recipeRoutes from '../server/routes/Recipes/recipeRoutes.js'
+// app.use('/recipe', recipeRoutes);
+// import recipesRoutes from '../server/routes/Recipes/recipeRoutes.js'
+// app.use('/recipes', recipesRoutes);
 
-// Import the DbConnector class
-const DbConnector = require("./dbConnector.js");
+function setPort(portnumber){
+  app.listen(portnumber, () => {
+    console.log(`Example app listening on port ${portnumber}`)
+  })
+}
 
-// Create a new DbConnector instance with your URI and database name
-const dbConnector = new DbConnector(
-  "mongodb://localhost:27017",
-  "sample_mflix"
-);
+async function connectToDB(){
+  if(dbConnectorType === 'MongoDB'){
+    const dbConnector = new mongoDBConnector(dbURL, credentials, dbName)
+    await dbConnector.connect()
+    console.log("awaiting")
+    return dbConnector
+  }else{
+    console.error(`DB Connector of type ${dbConnectorType} not implemented. Exiting...`);
+    process.exit(1); // Exit with a non-zero status code
+  }
+}
+
 
 // Define an async function to run the server logic
 async function run() {
   try {
     // Connect to the database
-    await dbConnector.connect();
-
-    // Perform some CRUD operations on various collections
-    // For example, insert a document into the movies collection
-    await dbConnector.insertOne("movies", {
-      title: "The Matrix",
-      year: 1999,
-      genres: ["Action", "Sci-Fi"],
-    });
-
-    // For example, find one document from the users collection
-    const user = await dbConnector.findOne("users", {
-      email: "alice@example.com",
-    });
-    console.log(user);
-
-    // For example, update one document in the comments collection
-    await dbConnector.updateOne(
-      "comments",
-      { _id: "5a9427648b0beebeb69579cc" },
-      { $set: { text: "This is an updated comment" } }
-    );
-
-    // For example, delete one document from the sessions collection
-    await dbConnector.deleteOne("sessions", {
-      user_id: "5a989e4a1d967e001a7889d4",
-    });
+    dbConnector = await connectToDB()
+    
+    //Setup Express App
+    setPort(port)
+    console.log(`Server successfully created and running on Port: ${port}. Connected to DB Type: ${dbConnectorType}`)
+    //TODO Need to add a command to end db connection and shut down server
   } catch (err) {
     // Log an error message
     console.error(err);
-  } finally {
-    // Disconnect from the database
-    await dbConnector.disconnect();
   }
 }
 
-// Run the server logic
+// Run the server
 run().catch(console.error);

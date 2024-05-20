@@ -1,10 +1,10 @@
 export default class Ingredient {
     constructor(ingredientName, integrientTypeInfo, measurementInfo, nutrientsInfo, costInfo){
-        ingredientName = this.name
-        integrientTypeInfo = this.integrientTypeInfo
-        measurementInfo = this.measurementInfo
-        nutrientsInfo = this.nutrientsInfo
-        costInfo = this.costInfo
+        this.ingredientName = ingredientName
+        this.integrientTypeInfo = integrientTypeInfo
+        this.measurementInfo = measurementInfo
+        this.nutrientsInfo = nutrientsInfo
+        this.costInfo = costInfo
     }
 
     getName(){
@@ -25,6 +25,20 @@ export default class Ingredient {
 
     getCostInfo(){
         return this.costInfo
+    }
+
+    static fromJSON(jsonObj){
+        return new Ingredient(jsonObj.ingredientName, jsonObj.integrientTypeInfo, jsonObj.measurementInfo, jsonObj.nutrientsInfo, jsonObj.costInfo)
+    }
+
+    toJSON(){
+        return {
+            'ingredientName': this.ingredientName,
+            'integrientTypeInfo': this.integrientTypeInfo,
+            'measurementInfo': this.measurementInfo,
+            'nutrientsInfo': this.nutrientsInfo,
+            'costInfo': this.costInfo
+        }
     }
 
 }

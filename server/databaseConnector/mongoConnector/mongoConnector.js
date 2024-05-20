@@ -1,3 +1,4 @@
+import Ingredient from '../../dataObjects/ingredients.js';
 import  User  from '../../dataObjects/user.js';
 import databaseConnector from '../databaseConnector.js';
 import { MongoClient, ServerApiVersion } from 'mongodb';
@@ -20,7 +21,6 @@ export default class mongoDBConnector extends databaseConnector{
     this.dbName = dbName
     this.connected = false
     //attempt to connect to client
-    this.connect()
   }
 
   // Connect to the database
@@ -79,7 +79,6 @@ export default class mongoDBConnector extends databaseConnector{
       }
     }
   }
-
 
   async readUser(userNameToFind) {
       try{
@@ -206,56 +205,78 @@ export default class mongoDBConnector extends databaseConnector{
   }
 
   async createIngredient(ingredienToAdd) {
-    let documentJSON = []
-    
+    let documentJSON = {ingredientList : []}
+
     for (let index = 0; index < ingredienToAdd.length; index++) {
-      documentJSON.append(ingredienToAdd[index].toJSON())
+      documentJSON.ingredientList.push(ingredienToAdd[index].toJSON())
     }
     
     try{
-      collection = this.db.collection(this.collectionMap['Ingredients']) 
-      await collection.insertMany(documentJSON)
+      let collection = this.db.collection(this.collectionMap['Ingredients']) 
+      await collection.insertMany(documentJSON.ingredientList)
+      return true
     }catch(err){
+      if(err.errmsg.includes('E11000')){
+        console.error("Ingredient already exists");        
+        console.error(err.errmsg);
+      }
       console.error(err);
     }
   }
 
-  async searchIngredients(name) {
+  async readIngredient(ingredientNameToFind) {
+    try{
+      let collection = this.db.collection(this.collectionMap['Ingredients']) 
+      let cursor = await collection.find({ingredientName: ingredientNameToFind})
+      let foundIngredient = Ingredient.fromJSON(await cursor.next())
+      return foundIngredient
+    }catch(err){
+      //TODO: catch if error is TypeError: Cannot read properties of null -> ingredient not found
+      console.error(err);
+    }
+  }
+ 
+  async searchIngredients(ingredientName) {
     //build search query
     const query = {
       $or: [
-        { name: { $regex: name, $options: "i" } } // Case-insensitive
+        { ingredientName: { $regex: ingredientName, $options: "i" } } // Case-insensitive
       ],
     };
     try{
       let collection = this.db.collection(this.collectionMap['Ingredients']) 
-      let foundRecipes = await collection.find(query).toArray()
-      return foundRecipes
+      let foundIngredientsCursor = await collection.find(query)
+      let returnIngredientsList = []
+      for await (const returnDoc of foundIngredientsCursor) {
+        returnIngredientsList.push(Ingredient.fromJSON(returnDoc))
+      }
+      return returnIngredientsList
     }catch(err){
       console.error(err);
     }
-
   }
 
-  async updateIngredient(ingredientObject) {
-    updateDoc = ingredientObject.toJSON()
-    filter = {'name': ingredientObject.getRecipeName()};
-    options = { upsert: true };
+  async updateIngredient(ingredientName, ingredientObject) {
+    let updateDoc = { $set: ingredientObject.toJSON() }
+    let filter = {'ingredientName': ingredientName};
+    let options = { upsert: true };
+    
     try{
-      collection = this.db.collection(this.collectionMap['Ingredients']) 
-      result = await collection.updateOne(filter, updateDoc, options)
+      let collection = this.db.collection(this.collectionMap['Ingredients']) 
+      let result = await collection.updateOne(filter, updateDoc, options)
+      return result
     }catch(err){
       console.error(err)
     }
   }
-
+  
   async deleteIngredient(ingredientName) {
-    query = {'name': ingredientName};
+    let query = {'ingredientName': ingredientName};
     try{
-      collection = this.db.collection(this.collectionMap['Ingredients']) 
-      result = await collection.deleteOne(query)
+      let collection = this.db.collection(this.collectionMap['Ingredients']) 
+      let result = await collection.deleteOne(query)
       if ( result.deletedCount == 1){
-        console.log("Successfully deleted recipe:" + ingredientName)
+        console.log("Successfully deleted ingredient:" + ingredientName)
       }
       else{
         console.log("No documents matched. 0 ingredients deleted")
