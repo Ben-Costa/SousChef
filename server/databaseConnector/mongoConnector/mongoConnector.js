@@ -146,18 +146,33 @@ export default class mongoDBConnector extends databaseConnector{
     }
   }
 
+  /**
+   * 
+   * @param {[string]} recipeToAdd recipes to add 
+   */
   async createRecipe(recipeToAdd) {
-    let documentJSON = []
+
+    let recipes = [];
     
-    for (let index = 0; index < recipeToAdd.length; index++) {
-      documentJSON.append(recipeToAdd[index].toJSON())
-    }  
+    for (const recipe of recipeToAdd) {
+
+      let jsonObj = recipe.toJSON();
+      jsonObj.creationTime = new Date();
+      recipes.push(jsonObj);
+    }
+    
+    let promises = []
     try{
-      collection = this.db.collection(this.collectionMap['Recipes']) 
-      await collection.insertMany(documentJSON)
+      let collection = this.db.collection(this.collectionMap['Recipes']);
+      console.log(recipes);
+      let f = await collection.insertMany(recipes);
+      console.log(f);
     }catch(err){
+
       console.error(err);
     }
+
+    console.log("Done creating the recipe!");
   }
 
   async searchRecipes(recipeName, ingredients) {
