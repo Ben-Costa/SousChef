@@ -162,7 +162,6 @@ export default class mongoDBConnector extends databaseConnector{
       recipes.push(jsonObj);
     }
     
-    let promises = []
     try{
       let collection = this.db.collection(this.collectionMap['Recipes']);
       console.log(recipes);
@@ -202,7 +201,7 @@ export default class mongoDBConnector extends databaseConnector{
       let collection = this.db.collection(this.collectionMap['Recipes']) 
       let foundRecipes = await collection.find(query).toArray()
       for (const recipe of foundRecipes) {
-        let currentRecipe = Recipe.placeholderCreate(recipe);
+        let currentRecipe = Recipe.fromJSON(recipe);
         currentRecipe._id = recipe._id;
         recipes.push(currentRecipe);
       }
