@@ -15,8 +15,15 @@ const dbName = process.env.DB_NAME;
 
 const db_connector = new mongoDBConnector(dbURL, credentials, dbName)
 while(!db_connector.connected){
-    console.log('Waiting for Database Connection')
-    await wait(1000);
+    try {
+        console.log('Waiting for Database Connection')
+        console.log(db_connector)
+        await wait(5000);
+    } catch (error) {
+        console.error(err);
+        throw err
+    }
+
 }
 
 //User CRUD Integration Tests
