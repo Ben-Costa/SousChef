@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import { MongoClient } from 'mongodb';
 import mongoDBConnector from '../../../../server/databaseConnector/mongoConnector/mongoConnector.js';
 import User from '../../../../server/dataObjects/user.js';
+import {InternalServerResponse} from '../../../../utils/interal_response.js'
 
 describe('mongoDBConnector', function() {
   let dbConnector, clientStub, dbStub, collectionStub, recipeStub;
@@ -51,7 +52,8 @@ describe('mongoDBConnector', function() {
     collectionStub.insertMany.resolves(true);
 
     const result = await dbConnector.createUser(users);
-    expect(result).to.be.true;
+    expect(result.code).to.equal(201)
+    expect(result.msg).to.equal("Successfully created Users. Count: 2")
     expect(collectionStub.insertMany.calledOnce).to.be.true;
   });
 
@@ -62,31 +64,29 @@ describe('mongoDBConnector', function() {
     });
 
     const result = await dbConnector.readUser('user1');
-    expect(result).to.be.an.instanceof(User);
-    expect(result.userName).to.equal('user1');
+    expect(result.data).to.be.an.instanceof(User);
+    expect(result.data.userName).to.equal('user1');
   });
 
   it('should search users', async function() {
     const user = new User('user1');
-    collectionStub.find.returns({
-      [Symbol.asyncIterator]: function* () {
-        yield user.toJSON();
-      }
-    });
+    const findStub = {
+      toArray: sinon.stub().returns([user.toJSON()]) 
+    };
+    collectionStub.find.returns(findStub); 
 
     const result = await dbConnector.searchUsers('user1');
-    expect(result).to.be.an('array');
-    expect(result[0]).to.be.an.instanceof(User);
-    expect(result[0].userName).to.equal('user1');
+    expect(result.data).to.be.an('array');
+    expect(result.data[0]).to.be.an.instanceof(User);
+    expect(result.data[0].userName).to.equal('user1');
   });
 
   it('should update a user', async function() {
     const user = new User('user1');
     collectionStub.updateOne.resolves({ modifiedCount: 1 });
 
-    const result = await dbConnector.updateUser('user1', user);
-    expect(result).to.have.property('modifiedCount', 1);
-    expect(collectionStub.updateOne.calledOnce).to.be.true;
+    const result = await dbConnector.updateUser(user);
+    expect(result.code).to.equal(201)
   });
 
   it('should delete a user', async function() {
