@@ -2,11 +2,11 @@ import Ingredient  from "./ingredients.js"
 
 export default class Recipe{
     constructor(name, ingredientsList, steps, servings, timeInfo){
-        name = this.name
-        ingredientsList = this.ingredientsList
-        steps = this.steps
-        servings = this.servings
-        timeInfo = this.timeInfo
+        this.name = name
+        this.ingredientsList = ingredientsList 
+        this.steps = steps
+        this.servings = servings 
+        this.timeInfo = timeInfo
     }
 
     getName(){
@@ -27,5 +27,19 @@ export default class Recipe{
     
     getTimeInfo(){
         return this.timeInfo
+    }
+
+    static fromJSON(jsonObj){
+        return new Recipe(jsonObj.name, jsonObj.ingredientsList, jsonObj.steps, jsonObj.servings, jsonObj.timeInfo)
+    }
+
+    toJSON(){
+        return {
+            'name': this.name,
+            'ingredientsList': this.ingredientsList,
+            'steps': this.steps,
+            'servings': this.servings,
+            'timeInfo': this.timeInfo
+        }
     }
 }

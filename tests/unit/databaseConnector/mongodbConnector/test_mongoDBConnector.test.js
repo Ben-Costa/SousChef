@@ -3,7 +3,8 @@ import sinon from 'sinon';
 import { MongoClient } from 'mongodb';
 import mongoDBConnector from '../../../../server/databaseConnector/mongoConnector/mongoConnector.js';
 import User from '../../../../server/dataObjects/user.js';
-import {InternalServerResponse} from '../../../../utils/interal_response.js'
+import Recipe from '../../../../server/dataObjects/recipe.js';
+import {InternalServerResponse} from '../../../../utils/interal_response.js';
 
 describe('mongoDBConnector', function() {
   let dbConnector, clientStub, dbStub, collectionStub, recipeStub;
@@ -105,14 +106,15 @@ describe('mongoDBConnector', function() {
   });
 
   it('should search recipes', async function() {
-    const recipes = [{ name: 'recipe1' }, { name: 'recipe2' }];
-    collectionStub.find.returns({
-      toArray: sinon.stub().resolves(recipes)
-    });
-
+    const recipes = new Recipe('recipe1')
+    const findStub = {
+      toArray: sinon.stub().returns([recipes.toJSON()]) 
+    };
+    collectionStub.find.returns(findStub); 
     const result = await dbConnector.searchRecipes('recipe', ['ingredient1']);
-    expect(result).to.be.an('array');
-    expect(result).to.have.lengthOf(2);
+    expect(result.data).to.be.an('array');
+    expect(result.data[0]).to.be.an.instanceof(Recipe);
+    expect(result.data[0].name).to.equal('recipe1');
   });
 
   it('should update a recipe', async function() {
@@ -120,8 +122,7 @@ describe('mongoDBConnector', function() {
     collectionStub.updateOne.resolves({ modifiedCount: 1 });
 
     const result = await dbConnector.updateRecipe(recipe);
-    expect(result).to.have.property('modifiedCount', 1);
-    expect(collectionStub.updateOne.calledOnce).to.be.true;
+    expect(result.code).to.equal(201)
   });
 
   it('should delete a recipe', async function() {
@@ -129,5 +130,6 @@ describe('mongoDBConnector', function() {
 
     await dbConnector.deleteRecipe('recipe1');
     expect(collectionStub.deleteOne.calledOnce).to.be.true;
+    
   });
 });

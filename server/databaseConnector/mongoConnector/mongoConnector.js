@@ -34,7 +34,6 @@ export default class mongoDBConnector extends databaseConnector{
         tlsCertificateKeyFile: this.credentials,
         serverApi: ServerApiVersion.v1
       });
-      console.log("1");
       // Connect to the server
       await this.client.connect();
       console.log("2");
@@ -78,7 +77,7 @@ export default class mongoDBConnector extends databaseConnector{
     try{
       //use let for all collection creations
       let collection = this.db.collection(this.collectionMap[collectionMapName]) 
-      await collection.insertMany(documentJSON)
+      await collection.insertMany(documentJSON.userList)
       return new InternalServerResponse("DBConnectorResponse", 201, 
       `Successfully created ${objectType}. Count: ` + objectsToAdd.length,
       "")
@@ -87,7 +86,7 @@ export default class mongoDBConnector extends databaseConnector{
       //      will need to search through json list for usernames that match that found in error msg
       if(err.errmsg.includes('E11000')){
         console.error(err.errmsg);
-        let error = ObjectAlreadyExistsError(err.errmsg)
+        let error = new ObjectAlreadyExistsError(err.errmsg)
         return error
       }
       console.error(err);
@@ -97,12 +96,17 @@ export default class mongoDBConnector extends databaseConnector{
 
   async _read(findDict, collectionMapName, dataObjectTypes, objectName){
     try{
+      console.log(findDict)
+      console.log(collectionMapName)
       let collection = this.db.collection(this.collectionMap[collectionMapName]) 
-      let cursor = await collection.find(findDict)
-      let foundobject = dataObjectTypes.fromJSON(await cursor.next())
+      let foundObject = await collection.find(findDict).toArray()
+
+      if(foundObject.length == 0){
+        return new NotFoundError(`No ${objectName} found with query: `+ findDict)
+      }
       let response = new InternalServerResponse("DBConnectorResponse", 200, 
                                              `Successfully found ${objectName}`, 
-                                             foundobject)
+                                             foundObject[0])
       return response
     }catch(err){
     console.error(err);
@@ -120,8 +124,9 @@ export default class mongoDBConnector extends databaseConnector{
     try{
       let collection = this.db.collection(this.collectionMap[collectionMapName]) 
       let foundObjects = await collection.find(query).toArray()
+      console.log(foundObjects.length)
       if(foundObjects.length == 0){
-        return NotFoundError(`No ${objectName} found with query: `+ query)
+        return new NotFoundError(`No ${objectName} found with query: `+ query)
       }
       let returnList = []
       for(let i = 0; i < foundObjects.length; i++){
@@ -162,7 +167,7 @@ export default class mongoDBConnector extends databaseConnector{
       }
       else{
         console.log(`No documents matched. 0 ${objectName} deleted`)
-        return NotFoundError(`No documents matched. 0 ${objectName} deleted`)
+        return new NotFoundError(`No documents matched. 0 ${objectName} deleted`)
       }
     }catch(err){
       console.error(err)
@@ -175,7 +180,7 @@ export default class mongoDBConnector extends databaseConnector{
   }
 
   async readUser(userNameToFind) {
-    return this._read({userName: userNameToFind}, 'Users', User, "User")  
+    return this._read({'userName': userNameToFind}, 'Users', User, "User")  
   }
 
   async searchUsers(userName) {
