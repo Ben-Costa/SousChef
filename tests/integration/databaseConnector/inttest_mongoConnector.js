@@ -64,8 +64,6 @@ describe('MongoDB Connector', function() {
 
     it('should read a single user', async function() {
         let readUser = await db_connector.readUser('JMan')
-        console.log("Read user: ")
-        console.log(readUser)
         expect(readUser.code).to.equal(200)
         expect(readUser.data.userName).to.equal('JMan')
     });
@@ -128,8 +126,6 @@ describe('MongoDB Connector', function() {
     it('should search for ingredients', async function() {
         let ingredientName = "b"
         const foundRecipes = await db_connector.searchIngredients(ingredientName);
-        console.log("Found recipes: ")
-        console.log(foundRecipes)
         expect(foundRecipes.code).to.equal(200)
     });
 
@@ -170,8 +166,9 @@ describe('MongoDB Connector', function() {
 
     it('should read a single recipe', async function() {
         let readRecipe = await db_connector.readRecipe('recipe1')
+        console.log(readRecipe)
         expect(readRecipe.code).to.equal(200)
-        expect(readRecipe.data.recipeName).to.equal('recipe1')
+        expect(readRecipe.data.name).to.equal('recipe1')
     });
 
     it('should not read a recipe that does not exist', async function() {
@@ -182,8 +179,6 @@ describe('MongoDB Connector', function() {
     it('should search for recipes', async function() {
         let recipeName = "r"
         const foundRecipes = await db_connector.searchRecipes(recipeName);
-        console.log("Found recipes: ")
-        console.log(foundRecipes)
         expect(foundRecipes.code).to.equal(200)
     });
 

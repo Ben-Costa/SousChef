@@ -68,3 +68,6 @@ async function run() {
 
 // Run the server
 run().catch(console.error);
+
+//export dbConnector for use in other files
+export {dbConnector}

@@ -16,7 +16,7 @@ export default class mongoDBConnector extends databaseConnector{
     this.collectionMap = {
       'Users': 'Users',
       'Ingredients': 'Ingredients',
-      'Recipes': 'recipeCollection'
+      'Recipes': 'Recipes'
     }
 
     //set the url, login credentials
@@ -208,17 +208,23 @@ export default class mongoDBConnector extends databaseConnector{
   }
   
   async readRecipe(recipeNameToFind) {
-    return this._read({recipeName: recipeNameToFind}, 'Recipes', Recipe, "Recipe")  
+    return this._read({name: recipeNameToFind}, 'Recipes', Recipe, "Recipe")  
   }
 
   async searchRecipes(recipeName, ingredients) {
+    // Ensure ingredients is an array
+    if (!Array.isArray(ingredients)) {
+        ingredients = [ingredients];
+    }
+
     const query = {
-      $or: [
-        { recipeName: { $regex: recipeName, $options: "i" } }, // Case-insensitive
-        { ingredients: { $in: ingredients } },
-      ],
+        $or: [
+            { name: { $regex: recipeName, $options: "i" } }, // Case-insensitive
+            { ingredients: { $in: ingredients } },
+        ],
     };
-    return this._search(query, 'Recipes', Recipe, 'Recipes') 
+
+    return this._search(query, 'Recipes', Recipe, 'Recipes');
   }
 
   async updateRecipe(recipeObject) {
