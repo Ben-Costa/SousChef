@@ -2,6 +2,8 @@ import  express from 'express'
 import dotenv from 'dotenv';
 dotenv.config();
 import mongoDBConnector from '../server/databaseConnector/mongoConnector/mongoConnector.js';
+import router from '../server/routes/Users/usersRoutes.js';
+import cors from 'cors';
 
 const app = express()
 const port = process.env.PORT_NUMBER;
@@ -10,26 +12,23 @@ const credentials = process.env.CREDENTIALS_PATH;
 const dbName = process.env.DB_NAME;
 const dbConnectorType = process.env.DB_CONNECTOR_TYPE
 let dbConnector
-console.log(dbConnectorType)
+
+app.use(cors());
+app.use(express.json());
 
 //Import in routes
 //User Routes
-import userRoutes from '../server/routes/Users/userRoutes.js'
-app.use('/user', userRoutes);
-import usersRoutes from '../server/routes/Users/usersRoutes.js'
-app.use('/users', usersRoutes);
+app.use('/user', router);
 
-// //Ingredients Routes
-// import ingredientRoutes from '../server/routes/Ingredients/ingredientRoutes.js'
-// app.use('/ingredient', ingredientRoutes);
-// import ingredientsRoutes from '../server/routes/Ingredients/ingredientsRoutes.js'
-// app.use('/ingredients', ingredientsRoutes);
+app.use((req, res, next) => {
+  res.setHeader("Content-Security-Policy", "default-src 'none'; connect-src 'self' http://localhost:3000; script-src 'self'; style-src 'self'");
+  next();
+});
 
-// //Recipes Routes
-// import recipeRoutes from '../server/routes/Recipes/recipeRoutes.js'
-// app.use('/recipe', recipeRoutes);
-// import recipesRoutes from '../server/routes/Recipes/recipeRoutes.js'
-// app.use('/recipes', recipesRoutes);
+//test route
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
 
 function setPort(portnumber){
   app.listen(portnumber, () => {

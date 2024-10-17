@@ -35,17 +35,28 @@ export default class User{
     }
 
     static fromJSON(jsonObj){
+        if (!jsonObj) {
+            throw new Error('Invalid JSON object');
+          }
+        if (!jsonObj.nameObj){
+            jsonObj.nameObj = new Name(jsonObj.firstName, jsonObj.lastName)
+        }
         return new User(jsonObj.userName, jsonObj.password, jsonObj.email, jsonObj.bDay, jsonObj.nameObj, jsonObj.profilePic)
     }
 
     toJSON(){
-        return {
-            'userName': this.userName,
-            'password': this.password,
-            'email': this.email,
-            'bDay': this.bDay,
-            'nameObj': this.nameObj,
-            'profilePic': this.profilePic
+        try{
+            return {
+                'userName': this.userName,
+                'password': this.password,
+                'email': this.email,
+                'bDay': this.bDay,
+                'nameObj': this.nameObj,
+                'profilePic': this.profilePic
+            }
+        }catch(error){
+            console.error(error)
         }
+
     }
 }

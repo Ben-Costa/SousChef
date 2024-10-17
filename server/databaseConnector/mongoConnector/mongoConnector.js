@@ -36,7 +36,7 @@ export default class mongoDBConnector extends databaseConnector{
       });
       // Connect to the server
       await this.client.connect();
-      console.log("2");
+      console.log(`dbName: ${this.dbName}`);
       // Get the database instance
       this.db = this.client.db(this.dbName);
       // Log a success message
@@ -102,12 +102,16 @@ export default class mongoDBConnector extends databaseConnector{
       let foundObject = await collection.find(findDict).toArray()
 
       if(foundObject.length == 0){
+        console.log(`No ${objectName} found with query: `+ findDict)
         return new NotFoundError(`No ${objectName} found with query: `+ findDict)
       }
+      console.log(foundObject[0])
       let response = new InternalServerResponse("DBConnectorResponse", 200, 
                                              `Successfully found ${objectName}`, 
-                                             foundObject[0])
+                                             dataObjectTypes.fromJSON(foundObject[0]))
+      //check if type of datsa is yser class
       return response
+    
     }catch(err){
     console.error(err);
     return new DatabaseError(err.errmsg)
@@ -115,26 +119,37 @@ export default class mongoDBConnector extends databaseConnector{
   }
 
   //may need to llook at text search operator
-  async _search(query, collectionMapName, dataObjectTypes, objectName) {
+  async _search(query, collectionMapName, dataObjectTypes, objectName, pageSize = 20, page = 1){
     //build search query
     //TODO: Add in name search
     //TODO: make it so search of "" does not add that item to query
     //TODO: if not items provided, search by username and return to limit
-    //TODO: add limit amount
     try{
+      //return pageSize + 1 to see if there are more pages
+      let limit = pageSize + 1;
+      let skip = (page - 1) * pageSize;
+  
       let collection = this.db.collection(this.collectionMap[collectionMapName]) 
-      let foundObjects = await collection.find(query).toArray()
+      let foundObjects = await collection.find(query)
+                                          .skip(skip)
+                                          .limit(limit)
+                                          .toArray()
       console.log(foundObjects.length)
-      if(foundObjects.length == 0){
+      const hasMore = foundObjects.length > pageSize;
+      if (hasMore) {
+        foundObjects.pop();
+      }
+
+      if(foundObjects.length === 0){
         return new NotFoundError(`No ${objectName} found with query: `+ query)
       }
       let returnList = []
       for(let i = 0; i < foundObjects.length; i++){
         returnList.push(dataObjectTypes.fromJSON(foundObjects[i]))
       } 
+      let responseData = {'data': returnList, 'pagination': {'hasMore': hasMore, 'currentPage': page, 'pageSize': pageSize}}
       return new InternalServerResponse("DBConnectorResponse", 200, 
-      `Successfully found ${objectName} with query: `+ query, 
-      returnList)
+      `Successfully found ${objectName} with query: `+ query, responseData)
     }catch(err){
       console.error(err);
       return new DatabaseError(err.errmsg)
@@ -180,18 +195,24 @@ export default class mongoDBConnector extends databaseConnector{
   }
 
   async readUser(userNameToFind) {
+    console.log("readUser")
     return this._read({'userName': userNameToFind}, 'Users', User, "User")  
   }
 
-  async searchUsers(userName) {
-    const query = {
-      $or: [
-        { userName: { $regex: userName, $options: "i" } }
-      ],
-    };
-    return this._search(query, 'Users', User, 'Users') 
+  async searchUsers(userName = "", pageSize = 20, page = 1, query = {}) {
+    let usersQuery = {};
+  
+    if (userName) {
+      usersQuery = {
+        $or: [
+          { userName: { $regex: userName, $options: "i" } }
+        ],
+      };
+    }
+    console
+    return this._search(usersQuery, 'Users', User, 'Users', pageSize, page);
   }
-
+  
   async updateUser(userObject) {
     let updateDoc = { $set: userObject.toJSON() }
     let filter = {'userName': userObject.getUserName()};
